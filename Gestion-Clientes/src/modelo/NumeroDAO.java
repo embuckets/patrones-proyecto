@@ -118,8 +118,12 @@ public class NumeroDAO {
 			
 			
 			Calendar ahora = Calendar.getInstance();
+			Date sqlDateAhora = new Date(ahora.getTimeInMillis());
+			ahora.add(Calendar.YEAR, 3);
+			Date sqlDateLiberacion = new Date(ahora.getTimeInMillis());
 			
-			String insertNumeroBaja = "insert into patrones.numero_baja values (" + numero.getNumero() + ");";
+			String insertNumeroBaja = "insert into patrones.numero_baja values ('" + numero.getNumero() 
+				+ "' , '" + sqlDateAhora.toString() + "', '" + sqlDateLiberacion.toString() + "' );";
 			statement = conn.createStatement();
 			insertNumeroBajaSuccessful = statement.executeUpdate(insertNumeroBaja);
 			

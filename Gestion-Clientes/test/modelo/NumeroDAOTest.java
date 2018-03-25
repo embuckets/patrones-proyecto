@@ -57,6 +57,20 @@ class NumeroDAOTest {
 		//fail("Not yet implemented");
 	}
 	
+	@Test
+	void testDarDeBaja() {
+		System.out.println("baja");
+		
+		Numero numero = new Numero("5526594815", Numero.Estado.asignado);
+		
+		NumeroDAO dao = new NumeroDAO();
+		boolean success = dao.darDeBaja(numero);
+		System.out.println(success);
+		System.out.println("numero: " + numero.getNumero());
+		System.out.println();
+		//fail("Not yet implemented");
+	}
+	
 	
 
 	public static void main(String[] args) {
