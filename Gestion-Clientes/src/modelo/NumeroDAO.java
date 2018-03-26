@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class NumeroDAO {
-	public Numero buscarNumero(String numero) {
+	
+	public Numero buscarNumero(Numero numero) {
 		Numero numeroARegresar = null;
 		try {
 			DataConnector connector = new DataConnector();
 			Connection conn = connector.getConnection();
 			Statement statement = null;
-			String query = "select * from patrones.numero where numero=" + "'" + numero + "'";
+			String query = "select * from patrones.numero where numero=" + "'" + numero.getNumero() + "'";
 			statement = conn.createStatement();
 			ResultSet resultSet = statement.executeQuery(query);
 
@@ -53,14 +54,14 @@ public class NumeroDAO {
 		return numeroARegresar;
 	}
 	
-	public ArrayList<Numero> buscarNumeroDelCliente(Integer id_cliente) {
+	public ArrayList<Numero> buscarNumerosDelCliente(Cliente cliente) {
 		ArrayList<Numero> numerosDelCliente = new ArrayList<Numero>();
 		
 		try {
 			DataConnector connector = new DataConnector();
 			Connection conn = connector.getConnection();
 			Statement statement = null;
-			String query = "select * from patrones.numero_asignado where id_cliente=" + id_cliente;
+			String query = "select * from patrones.numero_asignado where id_cliente=" + cliente.getId();
 			statement = conn.createStatement();
 			ResultSet resultSet = statement.executeQuery(query);
 			while (resultSet.next()) {
@@ -137,7 +138,29 @@ public class NumeroDAO {
 		return (deleteNumeroAsignadoSuccessful > 0 && updateNumeroSuccessful > 0 && insertNumeroBajaSuccessful > 0);
 	}
 
-	
+	public boolean buscarSiNumeroEsDelCliente(Numero numero, Cliente cliente) {
+		boolean esDelCliente = false;
+		
+		try {
+			DataConnector connector = new DataConnector();
+			Connection conn = connector.getConnection();
+			Statement statement = null;
+			String query = "select * from patrones.numero_asignado where id_cliente=" + cliente.getId()
+				+ " and numero='" + numero.getNumero() + "';";
+			statement = conn.createStatement();
+			
+			ResultSet resultSet = statement.executeQuery(query);
+			while (resultSet.next()) {
+				esDelCliente = true;
+			}
+			conn.close();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			// TODO: handle exception
+		}
+		return esDelCliente;
+		
+	}
 	
 	
 	
