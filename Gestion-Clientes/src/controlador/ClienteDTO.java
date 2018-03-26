@@ -6,41 +6,57 @@ import modelo.Cliente;
 import modelo.Numero;
 
 public class ClienteDTO {
-	private Cliente cliente;
-	private ArrayList<Numero> numerosRegistrados;
-	private ArrayList<Numero> numerosPorAsignar;
-	private ArrayList<Numero> numerosPorCancelar;
-	
-	public ClienteDTO(Cliente cliente, ArrayList<Numero> numerosRegistrados, ArrayList<Numero> numerosPorAsignar,
-			ArrayList<Numero> numerosPorCancelar) {
-		this.cliente = cliente;
-		this.numerosRegistrados = numerosRegistrados;
-		this.numerosPorAsignar = numerosPorAsignar;
-		this.numerosPorCancelar = numerosPorCancelar;
-	}
 
-	public String getNombre() {
-		return cliente.getNombre();
-	}
-	
-	public String getPaterno() {
-		return cliente.getPaterno();
-	}
-	
-	public String getMaterno() {
-		return cliente.getMaterno();
-	}
+    private Cliente cliente;
+    private ArrayList<NumeroDTO> numerosRegistrados;
+    private ArrayList<NumeroDTO> numerosPorAsignar;
+    private ArrayList<NumeroDTO> numerosPorCancelar;
 
-	public ArrayList<Numero> getNumerosRegistrados() {
-		return numerosRegistrados;
-	}
+    public ClienteDTO(Cliente cliente, ArrayList<Numero> numerosRegistrados, ArrayList<Numero> numerosPorAsignar,
+            ArrayList<Numero> numerosPorCancelar) {
+        this.cliente = cliente;
+        this.numerosRegistrados = new ArrayList<NumeroDTO>();
+        this.numerosPorAsignar = new ArrayList<NumeroDTO>();
+        this.numerosPorCancelar = new ArrayList<NumeroDTO>();
+        
+        for(Numero numero : numerosRegistrados){
+            NumeroDTO numeroDTO = new NumeroDTO(numero);
+            this.numerosRegistrados.add(numeroDTO);
+       }
+        
+        for(Numero numero : numerosPorAsignar){
+            NumeroDTO numeroDTO = new NumeroDTO(numero);
+            this.numerosPorAsignar.add(numeroDTO);
+       }
+        
+        for(Numero numero : numerosPorCancelar){
+            NumeroDTO numeroDTO = new NumeroDTO(numero);
+            this.numerosPorCancelar.add(numeroDTO);
+       }
+    }
 
-	public ArrayList<Numero> getNumerosPorAsignar() {
-		return numerosPorAsignar;
-	}
+    public String getNombre() {
+        return cliente.getNombre();
+    }
 
-	public ArrayList<Numero> getNumerosPorCancelar() {
-		return numerosPorCancelar;
-	}
-	
+    public String getPaterno() {
+        return cliente.getPaterno();
+    }
+
+    public String getMaterno() {
+        return cliente.getMaterno();
+    }
+
+    public ArrayList<NumeroDTO> getNumerosRegistrados() {
+        return numerosRegistrados;
+    }
+
+    public ArrayList<NumeroDTO> getNumerosPorAsignar() {
+        return numerosPorAsignar;
+    }
+
+    public ArrayList<NumeroDTO> getNumerosPorCancelar() {
+        return numerosPorCancelar;
+    }
+
 }

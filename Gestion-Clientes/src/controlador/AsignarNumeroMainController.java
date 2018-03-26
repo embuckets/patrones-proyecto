@@ -36,11 +36,15 @@ public class AsignarNumeroMainController extends Observable{
 		Cliente cliente = clienteDAO.buscarCliente(paterno, materno, nombre);
 		if (cliente != null) {
 			this.cliente = cliente;
-			buscarNumerosDelCliente(cliente);
+			NumeroDAO numeroDAO = new NumeroDAO();
+			ArrayList<Numero> numerosDelCliente = numeroDAO.buscarNumerosDelCliente(cliente);
+			for (Numero numero : numerosDelCliente) {
+				numerosRegistrados.add(numero);
+			}
 			success = true;
-			setChanged();
-			notifyObservers();
 		}
+		setChanged();
+		notifyObservers();
 		return success;
 		
 	}
