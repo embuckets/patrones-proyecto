@@ -36,6 +36,10 @@ public class AsignarNumeroMainController extends Observable{
 		Cliente cliente = clienteDAO.buscarCliente(paterno, materno, nombre);
 		if (cliente != null) {
 			this.cliente = cliente;
+			numerosRegistrados = new ArrayList<Numero>();
+			numerosPorAsignar = new ArrayList<Numero>();
+			numerosPorCancelar = new ArrayList<Numero>();
+			
 			NumeroDAO numeroDAO = new NumeroDAO();
 			ArrayList<Numero> numerosDelCliente = numeroDAO.buscarNumerosDelCliente(cliente);
 			for (Numero numero : numerosDelCliente) {
@@ -93,6 +97,8 @@ public class AsignarNumeroMainController extends Observable{
 			numeroDAO.darDeBaja(numero);
 		}
 		
+		buscarCliente(cliente.getNombre(), cliente.getPaterno(), cliente.getMaterno());
+		
 		setChanged();
 		notifyObservers();
 		
@@ -106,10 +112,6 @@ public class AsignarNumeroMainController extends Observable{
 		for (Numero numero : numerosDelCliente) {
 			numerosRegistrados.add(numero);
 		}
-	}
-	
-	public void cancelarCambios() {
-		
 	}
 	
 }
