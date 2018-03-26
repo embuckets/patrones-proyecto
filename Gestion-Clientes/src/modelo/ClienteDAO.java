@@ -48,7 +48,7 @@ public class ClienteDAO {
 			DataConnector connector = new DataConnector();
 			Connection conn = connector.getConnection();
 			Statement statement = null;
-			String query = "select * from cliente where id_cliente=" + "'" + idCliente.getId() + "'";
+			String query = "select * from cliente where id_cliente=" + "'" + idCliente.getId() + "';";
 			statement = conn.createStatement();
 			ResultSet resultSet = statement.executeQuery(query);
 
@@ -74,7 +74,7 @@ public class ClienteDAO {
 			Connection conn = connector.getConnection();
 			Statement statement = null;
 			String query = "select * from cliente where paterno='" + p + "' and materno='" + m + "' and nombre='" + name
-					+ "'";
+					+ "';";
 			statement = conn.createStatement();
 			ResultSet resultSet = statement.executeQuery(query);
 
