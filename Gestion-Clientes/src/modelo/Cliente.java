@@ -44,5 +44,11 @@ public class Cliente {
 	public void setMaterno(String materno) {
 		this.materno = materno;
 	}
+	
+	@Override
+    public String toString() {
+        return nombre + " " + paterno + " " + materno;
+    }
+	
 
 }
