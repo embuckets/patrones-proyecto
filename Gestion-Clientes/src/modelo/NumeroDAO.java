@@ -3,6 +3,7 @@ package modelo;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class NumeroDAO {
 	
@@ -30,20 +31,21 @@ public class NumeroDAO {
 		return numeroARegresar;
 	}
 	
-	public Numero buscarDisponible() {
-		Numero numeroARegresar = null;
+	public List<Numero> buscarDisponible() {
+		List<Numero> numerosARegresar = new ArrayList<Numero>();
 		try {
 			DataConnector connector = new DataConnector();
 			Connection conn = connector.getConnection();
 			Statement statement = null;
-			String query = "select * from patrones.numero where estado=" + "'" + "disponible" + "'" + " limit 1";
+			String query = "select * from patrones.numero where estado=" + "'" + "disponible" + "';";
 			statement = conn.createStatement();
 			ResultSet resultSet = statement.executeQuery(query);
 
-			if (resultSet.next()) {
+			while (resultSet.next()) {
 				String resultNumero = resultSet.getString("numero");
 				Numero.Estado estado = Numero.Estado.valueOf(resultSet.getString("estado"));
-				numeroARegresar = new Numero(resultNumero, estado);
+				Numero numeroDisponible = new Numero(resultNumero, estado);
+				numerosARegresar.add(numeroDisponible);
 
 			}
 			conn.close();
@@ -51,11 +53,11 @@ public class NumeroDAO {
 			System.out.println(e.getMessage());
 			// TODO: handle exception
 		}
-		return numeroARegresar;
+		return numerosARegresar;
 	}
 	
-	public ArrayList<Numero> buscarNumerosDelCliente(Cliente cliente) {
-		ArrayList<Numero> numerosDelCliente = new ArrayList<Numero>();
+	public List<Numero> buscarNumerosDelCliente(Cliente cliente) {
+		List<Numero> numerosDelCliente = new ArrayList<Numero>();
 		
 		try {
 			DataConnector connector = new DataConnector();
