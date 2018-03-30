@@ -1,6 +1,8 @@
 package controlador;
 
+import java.util.Set;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Observable;
 
 import modelo.Cliente;
@@ -11,16 +13,16 @@ import modelo.NumeroDAO;
 public class AsignarNumeroMainController extends Observable{
 	private static AsignarNumeroMainController instance;
 	private Cliente cliente;
-	private ArrayList<Numero> numerosRegistrados;
-	private ArrayList<Numero> numerosPorAsignar;
-	private ArrayList<Numero> numerosPorCancelar;
+	private Set<Numero> numerosRegistrados;
+	private Set<Numero> numerosPorAsignar;
+	private Set<Numero> numerosPorCancelar;
 	
 	private AsignarNumeroMainController() {
 		super();
 		cliente = null;
-		numerosRegistrados = new ArrayList<Numero>();
-		numerosPorAsignar = new ArrayList<Numero>();
-		numerosPorCancelar = new ArrayList<Numero>();
+		numerosRegistrados = new HashSet<Numero>();
+		numerosPorAsignar = new HashSet<Numero>();
+		numerosPorCancelar = new HashSet<Numero>();
 	}
 	
 	public static AsignarNumeroMainController getInstance() {
@@ -31,21 +33,23 @@ public class AsignarNumeroMainController extends Observable{
 	}
 	
 	public boolean buscarCliente(String nombre, String paterno, String materno) {
+		numerosRegistrados = new HashSet<Numero>();
+		numerosPorAsignar = new HashSet<Numero>();
+		numerosPorCancelar = new HashSet<Numero>();
+		
 		boolean success = false;
 		ClienteDAO clienteDAO = new ClienteDAO();
-		Cliente cliente = clienteDAO.buscarCliente(paterno, materno, nombre);
-		if (cliente != null) {
-			this.cliente = cliente;
-			numerosRegistrados = new ArrayList<Numero>();
-			numerosPorAsignar = new ArrayList<Numero>();
-			numerosPorCancelar = new ArrayList<Numero>();
-			
+		Cliente clienteEncontrado = clienteDAO.buscarCliente(paterno, materno, nombre);
+		if (clienteEncontrado != null) {
+			this.cliente = clienteEncontrado;			
 			NumeroDAO numeroDAO = new NumeroDAO();
 			ArrayList<Numero> numerosDelCliente = numeroDAO.buscarNumerosDelCliente(cliente);
 			for (Numero numero : numerosDelCliente) {
 				numerosRegistrados.add(numero);
 			}
 			success = true;
+		}else {
+			this.cliente = new Cliente(-1, "", "", "");
 		}
 		setChanged();
 		notifyObservers();
@@ -63,23 +67,48 @@ public class AsignarNumeroMainController extends Observable{
 		NumeroDAO numeroDAO = new NumeroDAO();
 		Numero numero = numeroDAO.buscarDisponible();
 		if (numero != null) {
-			numerosPorAsignar.add(numero);
-			success = true;
+			success = numerosPorAsignar.add(numero);
+			System.out.println("[MainController - NumeroADarDeAlta]");
+			System.out.println("[" + numero.toString() + "]");
+			ClienteDTO dto = getCliente();
+			printClienteDTO(dto);
+			System.out.println();
+			//success = true;
 			setChanged();
 			notifyObservers();
 		}
 		
 		return success;
 	}
-	
+	boolean success = false;
 	public boolean darDeBajaNumero(String numero){
-		Numero numeroADarBaja = new Numero(numero, Numero.Estado.asignado);
 		boolean success = false;
+		String numeroFormateado = formatNumero(numero);
+		Numero numeroADarBaja = new Numero(numeroFormateado, Numero.Estado.disponible);
+		if(numerosPorAsignar.contains(numeroADarBaja)) {
+			numerosPorAsignar.remove(numeroADarBaja);
+			setChanged();
+			notifyObservers();
+			success = true;
+			return success;
+		}
+		else if(numerosPorCancelar.contains(numeroADarBaja)) {
+			numerosPorCancelar.remove(numeroADarBaja);
+			setChanged();
+			notifyObservers();
+			success = true;
+			return success;
+		}
+		
 		NumeroDAO numeroDAO = new NumeroDAO();
 		boolean esDelCliente = numeroDAO.buscarSiNumeroEsDelCliente(numeroADarBaja, cliente);
 		if (esDelCliente ) {
+			System.out.println("[MainController - NumeroADarDeBaja]");
+			System.out.println("[" + numero + "]");
 			numerosPorCancelar.add(numeroADarBaja);
 			success = true;
+			ClienteDTO dto = getCliente();
+			printClienteDTO(dto);
 			setChanged();
 			notifyObservers();
 		}
@@ -114,4 +143,29 @@ public class AsignarNumeroMainController extends Observable{
 		}
 	}
 	
+	private void printClienteDTO(ClienteDTO clienteDTO) {
+		System.out.println("-------clientedDTO-------");
+		System.out.println(clienteDTO.getNombre());
+		System.out.println(clienteDTO.getPaterno());
+		System.out.println(clienteDTO.getMaterno());
+		System.out.println("***Numeros REgistrados***");
+		for(NumeroDTO numero : clienteDTO.getNumerosRegistrados()) {
+			System.out.println(numero.getNumero());
+		}
+		System.out.println("***Numeros Por REgistrar***");
+		for(NumeroDTO numero : clienteDTO.getNumerosPorAsignar()) {
+			System.out.println(numero.getNumero());
+		}
+		System.out.println("***Numeros Por Cancelar***");
+		for(NumeroDTO numero : clienteDTO.getNumerosPorCancelar()) {
+			System.out.println(numero.getNumero());
+		}		
+		System.out.println("-------clientedDTO-------");
+	}
+	
+	private String formatNumero(String numero) {
+		String numeroFormateado = numero.replace("-", "");
+		return numeroFormateado;
+	}
+
 }

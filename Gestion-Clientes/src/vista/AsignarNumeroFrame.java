@@ -21,6 +21,8 @@ import javax.swing.table.TableModel;
 public class AsignarNumeroFrame extends javax.swing.JFrame {
 	private DatosClienteDisplayer datosClienteDisplayer;
 	private NumerosClienteDisplayer numerosClienteDisplayer;
+	private AsignarNumeroMainController mainController;
+
 	/**
 	 * Creates new form AsignarNumeroFrame
 	 */
@@ -30,9 +32,8 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 	}
 
 	private void initObservers() {
-		AsignarNumeroMainController mainController = AsignarNumeroMainController.getInstance();
-		this.datosClienteDisplayer = new DatosClienteDisplayer(datosNombreLabel, datosPaternoLabel,
-				datosMaternoLabel);
+		mainController = AsignarNumeroMainController.getInstance();
+		this.datosClienteDisplayer = new DatosClienteDisplayer(datosNombreLabel, datosPaternoLabel, datosMaternoLabel);
 		mainController.addObserver(datosClienteDisplayer);
 		this.numerosClienteDisplayer = new NumerosClienteDisplayer(numerosTable);
 		mainController.addObserver(numerosClienteDisplayer);
@@ -44,29 +45,39 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 		String paterno = paternoTextField.getText();
 		String materno = maternoTextField.getText();
 
-		AsignarNumeroMainController mainController = AsignarNumeroMainController.getInstance();
+		// AsignarNumeroMainController mainController =
+		// AsignarNumeroMainController.getInstance();
 		boolean success = mainController.buscarCliente(nombre, paterno, materno);
 		if (!success) {
-			JOptionPane.showMessageDialog(rootPane, "No existe el cliente", "No se encontro al cliente", ERROR);
+			JOptionPane.showMessageDialog(rootPane, "No existe el cliente", "No se encontro al cliente", JOptionPane.ERROR_MESSAGE);
 			this.numerosClienteDisplayer.reset();
 			this.datosClienteDisplayer.reset();
 		}
+		pack();
 
 	}// GEN-LAST:event_buscarButtonActionPerformed
 
 	private void agregarNumeroButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_buscarButtonActionPerformed
-		AsignarNumeroMainController mainController = AsignarNumeroMainController.getInstance();
-		mainController.buscarNumeroDisponible();
+		// AsignarNumeroMainController mainController =
+		// AsignarNumeroMainController.getInstance();
+		boolean success = mainController.buscarNumeroDisponible();
+		if(!success) {
+			JOptionPane.showMessageDialog(rootPane, "No tenemos numeros disponibles", "Numeros Disponibles", JOptionPane.INFORMATION_MESSAGE);
+		}
 
 	}// GEN-LAST:event_buscarButtonActionPerformed
 
 	private void borrarNumeroButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_buscarButtonActionPerformed
 		int row = numerosTable.getSelectedRow();
-		int column = numerosTable.getSelectedColumn();
+		int column = 1;
 		String numero = (String) numerosTable.getValueAt(row, column);
 
-		AsignarNumeroMainController mainController = AsignarNumeroMainController.getInstance();
-		mainController.darDeBajaNumero(numero);
+		// AsignarNumeroMainController mainController =
+		// AsignarNumeroMainController.getInstance();
+		boolean success = mainController.darDeBajaNumero(numero);
+		if(!success) {
+			JOptionPane.showMessageDialog(rootPane, "Este numero no esta registrado al cliente", "Cancelar Numero", JOptionPane.INFORMATION_MESSAGE);
+		}
 
 	}// GEN-LAST:event_buscarButtonActionPerformed
 
@@ -75,7 +86,8 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 	}// GEN-LAST:event_buscarButtonActionPerformed
 
 	private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_buscarButtonActionPerformed
-		AsignarNumeroMainController mainController = AsignarNumeroMainController.getInstance();
+		// AsignarNumeroMainController mainController =
+		// AsignarNumeroMainController.getInstance();
 		mainController.guardarCambios();
 
 	}// GEN-LAST:event_buscarButtonActionPerformed
@@ -96,11 +108,16 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 		public void update(Observable o, Object arg) {
 			AsignarNumeroMainController controller = (AsignarNumeroMainController) o;
 			ClienteDTO clienteDTO = controller.getCliente();
-			nombre.setText(clienteDTO.getNombre());
-			paterno.setText(clienteDTO.getPaterno());
-			materno.setText(clienteDTO.getMaterno());
+			if(clienteDTO.soyValido()) {
+				nombre.setText(clienteDTO.getNombre());
+				paterno.setText(clienteDTO.getPaterno());
+				materno.setText(clienteDTO.getMaterno());
+			}
+			else {
+				reset();
+			}
 		}
-		
+
 		public void reset() {
 			nombre.setText("");
 			paterno.setText("");
@@ -121,46 +138,51 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 		public void update(Observable o, Object arg) {
 			AsignarNumeroMainController controller = (AsignarNumeroMainController) o;
 			ClienteDTO clienteDTO = controller.getCliente();
-			String registrado = "registrado";
-			String porRegistrar = "por registrar";
-			String porCancelar = "por cancelar";
+			if(clienteDTO.soyValido()) {
+				String registrado = "registrado";
+				String porRegistrar = "por registrar";
+				String porCancelar = "por cancelar";
 
-			Vector<Vector> datos = new Vector<Vector>();
+				Vector<Vector> datos = new Vector<Vector>();
 
-			ArrayList<NumeroDTO> numerosRegistrados = clienteDTO.getNumerosRegistrados();
-			for (NumeroDTO numero : numerosRegistrados) {
-				Vector<String> row = new Vector<String>();
-				row.add(registrado);
-				row.add(numero.getNumeroFormatted());
-				datos.add(row);
+				ArrayList<NumeroDTO> numerosRegistrados = clienteDTO.getNumerosRegistrados();
+				for (NumeroDTO numero : numerosRegistrados) {
+					Vector<String> row = new Vector<String>();
+					row.add(registrado);
+					row.add(numero.getNumeroFormatted());
+					datos.add(row);
+				}
+
+				ArrayList<NumeroDTO> numerosPorRegistrar = clienteDTO.getNumerosPorAsignar();
+				for (NumeroDTO numero : numerosPorRegistrar) {
+					Vector<String> row = new Vector<String>();
+					row.add(porRegistrar);
+					row.add(numero.getNumeroFormatted());
+					datos.add(row);
+				}
+
+				ArrayList<NumeroDTO> numerosPorCancelar = clienteDTO.getNumerosPorCancelar();
+				for (NumeroDTO numero : numerosPorCancelar) {
+					Vector<String> row = new Vector<String>();
+					row.add(porCancelar);
+					row.add(numero.getNumeroFormatted());
+					datos.add(row);
+				}
+
+				Vector<String> headers = new Vector<String>();
+				headers.add("Estatus");
+				headers.add("Numero");
+				TableModel tableModel = new DefaultTableModel(datos, headers);
+				this.numerosTable.setModel(tableModel);
 			}
-
-			ArrayList<NumeroDTO> numerosPorRegistrar = clienteDTO.getNumerosPorAsignar();
-			for (NumeroDTO numero : numerosPorRegistrar) {
-				Vector<String> row = new Vector<String>();
-				row.add(porRegistrar);
-				row.add(numero.getNumeroFormatted());
-				datos.add(row);
+			else {
+				reset();
 			}
-
-			ArrayList<NumeroDTO> numerosPorCancelar = clienteDTO.getNumerosPorCancelar();
-			for (NumeroDTO numero : numerosPorCancelar) {
-				Vector<String> row = new Vector<String>();
-				row.add(porRegistrar);
-				row.add(numero.getNumeroFormatted());
-				datos.add(row);
-			}
-
-			Vector<String> headers = new Vector<String>();
-			headers.add("Estatus");
-			headers.add("Numero");
-			TableModel tableModel = new DefaultTableModel(datos, headers);
-			this.numerosTable.setModel(tableModel);
 		}
-		
+
 		public void reset() {
-			Object[][] data = {{null}};
-			Object[] headers = {"Estatus, Numero"};
+			Object[][] data = { { null } };
+			Object[] headers = { "Estatus, Numero" };
 			TableModel tableModel = new DefaultTableModel(data, headers);
 			this.numerosTable.setModel(tableModel);
 		}
@@ -214,11 +236,11 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 
 		buscarMaternoLabel.setText("Apellido Materno");
 
-		maternoTextField.setText("jTextField1");
+		maternoTextField.setText("segovia");
 
-		nombreTextField.setText("jTextField1");
+		nombreTextField.setText("emilio");
 
-		paternoTextField.setText("jTextField1");
+		paternoTextField.setText("hernandez");
 
 		buscarButton.setText("Buscar");
 		buscarButton.addActionListener(new java.awt.event.ActionListener() {
@@ -303,13 +325,13 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(datosPanelLayout.createSequentialGroup().addContainerGap()
 						.addGroup(datosPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-								.addComponent(jLabel4).addComponent(datosMaternoLabel))
+								.addComponent(jLabel4).addComponent(datosNombreLabel))
 						.addGap(18, 18, 18)
 						.addGroup(datosPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
 								.addComponent(jLabel5).addComponent(datosPaternoLabel))
 						.addGap(18, 18, 18)
 						.addGroup(datosPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-								.addComponent(jLabel6).addComponent(datosNombreLabel))
+								.addComponent(jLabel6).addComponent(datosMaternoLabel))
 						.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
 		numerosPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Numeros del Cliente",
@@ -350,18 +372,18 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 
 		numerosTable.setModel(new javax.swing.table.DefaultTableModel(new Object[][] { { null } },
 				new String[] { "Numero", "Estado" }));
-//		{
-//			Class[] types = new Class[] { java.lang.String.class };
-//			boolean[] canEdit = new boolean[] { false };
-//
-//			public Class getColumnClass(int columnIndex) {
-//				return types[columnIndex];
-//			}
-//
-//			public boolean isCellEditable(int rowIndex, int columnIndex) {
-//				return canEdit[columnIndex];
-//			}
-//		});
+		// {
+		// Class[] types = new Class[] { java.lang.String.class };
+		// boolean[] canEdit = new boolean[] { false };
+		//
+		// public Class getColumnClass(int columnIndex) {
+		// return types[columnIndex];
+		// }
+		//
+		// public boolean isCellEditable(int rowIndex, int columnIndex) {
+		// return canEdit[columnIndex];
+		// }
+		// });
 		tablaScrollPanel.setViewportView(numerosTable);
 
 		javax.swing.GroupLayout numerosPanelLayout = new javax.swing.GroupLayout(numerosPanel);
