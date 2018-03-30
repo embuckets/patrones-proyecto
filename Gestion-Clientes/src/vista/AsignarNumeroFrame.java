@@ -45,11 +45,10 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 		String paterno = paternoTextField.getText();
 		String materno = maternoTextField.getText();
 
-		// AsignarNumeroMainController mainController =
-		// AsignarNumeroMainController.getInstance();
 		boolean success = mainController.buscarCliente(nombre, paterno, materno);
 		if (!success) {
-			JOptionPane.showMessageDialog(rootPane, "No existe el cliente", "No se encontro al cliente", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(rootPane, "No existe el cliente", "No se encontro al cliente",
+					JOptionPane.ERROR_MESSAGE);
 			this.numerosClienteDisplayer.reset();
 			this.datosClienteDisplayer.reset();
 		}
@@ -58,11 +57,10 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 	}// GEN-LAST:event_buscarButtonActionPerformed
 
 	private void agregarNumeroButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_buscarButtonActionPerformed
-		// AsignarNumeroMainController mainController =
-		// AsignarNumeroMainController.getInstance();
 		boolean success = mainController.buscarNumeroDisponible();
-		if(!success) {
-			JOptionPane.showMessageDialog(rootPane, "No tenemos numeros disponibles", "Numeros Disponibles", JOptionPane.INFORMATION_MESSAGE);
+		if (!success) {
+			JOptionPane.showMessageDialog(rootPane, "No tenemos numeros disponibles", "Numeros Disponibles",
+					JOptionPane.INFORMATION_MESSAGE);
 		}
 
 	}// GEN-LAST:event_buscarButtonActionPerformed
@@ -72,11 +70,10 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 		int column = 1;
 		String numero = (String) numerosTable.getValueAt(row, column);
 
-		// AsignarNumeroMainController mainController =
-		// AsignarNumeroMainController.getInstance();
 		boolean success = mainController.darDeBajaNumero(numero);
-		if(!success) {
-			JOptionPane.showMessageDialog(rootPane, "Este numero no esta registrado al cliente", "Cancelar Numero", JOptionPane.INFORMATION_MESSAGE);
+		if (!success) {
+			JOptionPane.showMessageDialog(rootPane, "Este numero no esta registrado al cliente", "Cancelar Numero",
+					JOptionPane.INFORMATION_MESSAGE);
 		}
 
 	}// GEN-LAST:event_buscarButtonActionPerformed
@@ -86,9 +83,14 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 	}// GEN-LAST:event_buscarButtonActionPerformed
 
 	private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_buscarButtonActionPerformed
-		// AsignarNumeroMainController mainController =
-		// AsignarNumeroMainController.getInstance();
-		mainController.guardarCambios();
+		boolean success = mainController.guardarCambios();
+		if(success) {
+			JOptionPane.showMessageDialog(rootPane, "Se guardaron los cambios exitosamente", "Cambios del Cliente",
+					JOptionPane.INFORMATION_MESSAGE);
+		}else {
+			JOptionPane.showMessageDialog(rootPane, "Error al registrar los cambios", "Cambios del Cliente",
+					JOptionPane.ERROR_MESSAGE);
+		}
 
 	}// GEN-LAST:event_buscarButtonActionPerformed
 
@@ -108,12 +110,11 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 		public void update(Observable o, Object arg) {
 			AsignarNumeroMainController controller = (AsignarNumeroMainController) o;
 			ClienteDTO clienteDTO = controller.getCliente();
-			if(clienteDTO.soyValido()) {
+			if (clienteDTO.soyValido()) {
 				nombre.setText(clienteDTO.getNombre());
 				paterno.setText(clienteDTO.getPaterno());
 				materno.setText(clienteDTO.getMaterno());
-			}
-			else {
+			} else {
 				reset();
 			}
 		}
@@ -138,7 +139,7 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 		public void update(Observable o, Object arg) {
 			AsignarNumeroMainController controller = (AsignarNumeroMainController) o;
 			ClienteDTO clienteDTO = controller.getCliente();
-			if(clienteDTO.soyValido()) {
+			if (clienteDTO.soyValido()) {
 				String registrado = "registrado";
 				String porRegistrar = "por registrar";
 				String porCancelar = "por cancelar";
@@ -174,8 +175,7 @@ public class AsignarNumeroFrame extends javax.swing.JFrame {
 				headers.add("Numero");
 				TableModel tableModel = new DefaultTableModel(datos, headers);
 				this.numerosTable.setModel(tableModel);
-			}
-			else {
+			} else {
 				reset();
 			}
 		}

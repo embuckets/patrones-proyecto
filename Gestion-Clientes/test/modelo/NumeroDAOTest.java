@@ -3,6 +3,7 @@ package modelo;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +24,10 @@ class NumeroDAOTest {
 	void testBuscarDisponible() {
 		System.out.println("buscarDisponible");
 		NumeroDAO dao = new NumeroDAO();
-		Numero numero = dao.buscarDisponible();
-		System.out.println(numero.getNumero() + ", " + numero.getEstado());
+		List<Numero> numerosDisponibles = dao.buscarDisponible();
+		for(Numero numeroActual : numerosDisponibles) {
+			System.out.println(numeroActual.getNumero() + ", " + numeroActual.getEstado());
+		}
 		System.out.println();
 		// fail("Not yet implemented");
 	}
@@ -34,7 +37,7 @@ class NumeroDAOTest {
 		System.out.println("buscarNumeroDelCliente");
 		Cliente cliente = new Cliente(2, "test", "test", "test");
 		NumeroDAO dao = new NumeroDAO();
-		ArrayList<Numero> numerosDelCliente = dao.buscarNumerosDelCliente(cliente);
+		List<Numero> numerosDelCliente = dao.buscarNumerosDelCliente(cliente);
 		System.out.println("clietne: " + cliente.getId());
 		for (Numero numero : numerosDelCliente) {
 			System.out.println("- " + numero.getNumero());
